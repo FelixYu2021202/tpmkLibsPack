@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "@types/jquery": "^3.5.29",
+    "cheerio": "^1.0.0-rc.12",
+    "fs": "^0.0.1-security",
+    "jquery": "^3.7.1",
+    "ws": "^8.16.0"
+  }
+}
