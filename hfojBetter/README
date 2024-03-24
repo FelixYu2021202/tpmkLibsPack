@@ -15,7 +15,7 @@
 
 - Added code submission block in problem pages.
 
-### v1.3.0
+### v1.3.1
 
 - Added submission viewer block in problem pages.
 
@@ -23,4 +23,4 @@
 
 [Uncompressed](./hfojBetter.js)
 
-[Compressed](./dist-v1.3.0.min.js)
+[Compressed](./dist-v1.3.1.min.js)

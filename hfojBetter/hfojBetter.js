@@ -339,7 +339,7 @@
         }
         randselects = randselects.appendTo(randbody);
         let selectorOpened = false;
-        randselects.on("click", () => {
+        randselects.children().first().on("click", () => {
             if (!selectorOpened) {
                 randselects.find(".exrand-selector").show();
             }
@@ -384,7 +384,7 @@
                         success(res) {
                             console.log(res);
                             let pid = res.pdocs[id].docId;
-                            location = `${ppwd}/p/${pid}`;
+                            location = `${ppwd()}/p/${pid}`;
                         }
                     });
                 }
