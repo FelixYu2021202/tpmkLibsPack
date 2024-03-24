@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.1.0
+// @version      1.2.0
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://*.hfoj.net/*
 // @icon         http://hfoj.net/favicon.ico
-//
-// @require      https://code.jquery.com/jquery-3.7.1.min.js
 // ==/UserScript==
+
+// JQuery-v3.7.1 already satisfied by hfoj.
 
 (function () {
     'use strict';
@@ -16,6 +16,7 @@
         $ = require("jquery");
     }
 
+    //#region prework
     /**
      *
      * @param {string} que
@@ -34,6 +35,11 @@
     const domain = path.match(/\/d\/(\w+)/)?.[1];
     const relativePath = domain ? path.replace(/\/d\/(\w+)/, "") : path;
     const queries = parseSearch(location.search);
+
+    function ppwd() {
+        return domain ? `/d/${domain}` : "";
+    }
+    //#endregion prework
 
     //#region data
     const yiyan = [
@@ -73,6 +79,8 @@
         home: /^\/$/,
         homeIn: /^\/home/,
         problems: /^\/p(\/?)$/,
+        problem: /^\/p\/\w+(\/?)$/,
+        pid: /([^\/]+)(\/?)$/,
         homework: /^\/homework(\/?)$/,
         homeworkIn: /^\/homework/,
         discuss: /^\/discuss(\/?)$/,
@@ -105,6 +113,28 @@
         regs.forEach(reg => res ||= str.match(regices[reg]));
         return !res;
     }
+
+    const stdlang = {
+        luogu: "luogu.cxx/14/gcco2",
+        [null]: "cc.cc17o2",
+        [undefined]: "cc.cc17o2",
+        python: "py.py3",
+        ybtqm: "cc.cc17o2",
+        ybttg: "cc.cc17o2",
+        jjzn: "cc.cc17o2",
+        codeforces: "yoxi"
+    };
+
+    const stdlangdis = {
+        luogu: "NOI 标准语言 C++14 (O2)",
+        [null]: "C++17 (O2)",
+        [undefined]: "C++17 (O2)",
+        python: "Python 3",
+        ybtqm: "C++17 (O2)",
+        ybttg: "C++17 (O2)",
+        jjzn: "C++17 (O2)",
+        codeforces: "**无法提交**"
+    };
     //#endregion
 
     //#region styles
@@ -257,55 +287,74 @@
                 }
             })
             selected = selected.substring(1);
-            if (domain) {
-                $.ajax({
-                    method: "GET",
-                    url: `/d/${domain}/p?q=difficulty:${selected}`,
-                    headers: {
-                        accept: "application/json"
-                    },
-                    success(res) {
-                        let cnt = res.pcount;
-                        let sp = Math.ceil(Math.random() * cnt);
-                        let pg = Math.ceil(sp / 100);
-                        let id = (sp - 1) % 100 + 1;
-                        $.get(`/d/${domain}/p?q=difficulty:${selected}&page=${pg}`, res => {
-                            let pid = $(res).find(".col--pid")[id].innerText;
-                            location = `/p/${pid}`;
-                        });
-                    }
-                });
-            }
-            else {
-                $.ajax({
-                    method: "GET",
-                    url: `/p?q=difficulty:${selected}`,
-                    headers: {
-                        accept: "application/json"
-                    },
-                    success(res) {
-                        let cnt = res.pcount;
-                        let sp = Math.ceil(Math.random() * cnt);
-                        let pg = Math.ceil(sp / 100);
-                        let id = (sp - 1) % 100;
-                        $.ajax({
-                            method: "GET",
-                            url: `/p?q=difficulty:${selected}&page=${pg}`,
-                            headers: {
-                                accept: "application/json"
-                            },
-                            success(res) {
-                                console.log(res);
-                                let pid = res.pdocs[id].docId;
-                                location = `/p/${pid}`;
-                            }
-                        });
-                    }
-                });
-            }
+            $.ajax({
+                method: "GET",
+                url: `${ppwd()}/p?q=difficulty:${selected}`,
+                headers: {
+                    accept: "application/json"
+                },
+                success(res) {
+                    let cnt = res.pcount;
+                    let sp = Math.ceil(Math.random() * cnt);
+                    let pg = Math.ceil(sp / 100);
+                    let id = (sp - 1) % 100;
+                    $.ajax({
+                        method: "GET",
+                        url: `${ppwd()}/p?q=difficulty:${selected}&page=${pg}`,
+                        headers: {
+                            accept: "application/json"
+                        },
+                        success(res) {
+                            console.log(res);
+                            let pid = res.pdocs[id].docId;
+                            location = `${ppwd}/p/${pid}`;
+                        }
+                    });
+                }
+            });
         });
         randdiv = randdiv.prependTo($(".large-3, .medium-3")[0]);
     }
     //#endregion rand
 
+    //#region submit-code
+    if (match(relativePath, ["problem"])) {
+        let prob = relativePath.match(regices.pid)[1];
+        let submitbut = $(`<input type="submit" class="rounded primary button" value="递交"></input>`);
+        submitbut.on("click", () => {
+            let value = $("textarea").val();
+            fetch(`${ppwd()}/p/${prob}/submit`, {
+                headers: {
+                    accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
+                    "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
+                    "cache-control": "max-age=0",
+                    "content-type": "multipart/form-data; boundary=----WebKitFormBoundaryHappybobSaysYoxi",
+                    "upgrade-insecure-requests": "1"
+                },
+                referrer: `${ppwd()}/p/${prob}/submit`,
+                referrerPolicy: "strict-origin-when-cross-origin",
+                body: `------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="lang"\r\n\r\n${stdlang[domain]}\r\n------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="code"\r\n\r\n${value}\r\n------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="file"; filename=""\r\nContent-Type: application/octet-stream\r\n\r\n\r\n------WebKitFormBoundaryHappybobSaysYoxi--\r\n`,
+                method: "POST",
+                mode: "cors",
+                credentials: "include"
+            }).then(res => {
+                location = res.url;
+            });
+        });
+        let submitbody = $(`<div class="section__body">
+    <label>
+        代码语言：${stdlangdis[domain]}
+    </label>
+    <div class="medium-12">
+        <textarea class="textbox monospace" spellcheck="false"></textarea>
+    </div>
+</div>`).append(submitbut);
+        let submitdiv = $(`<div class="section visible">
+    <div class="section__header">
+        提交代码
+    </div>
+</div>`).append(submitbody);
+        $(".medium-9.columns").append(submitdiv);
+    }
+    //#endregion submit-code
 })();
