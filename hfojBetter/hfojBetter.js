@@ -18,9 +18,8 @@
 
     //#region prework
     /**
-     *
      * @param {string} que
-     * @returns {{[key: string]: string}}
+     * @returns {NodeJS.Dict<string>}
      */
     function parseSearch(que) {
         let res = {};
@@ -31,11 +30,30 @@
         return res;
     }
 
+    /**
+     * @param {string} coo
+     * @returns {NodeJS.Dict<string>}
+     */
+    function parseCookie(coo) {
+        let res = {};
+        coo.split("; ").forEach(q => {
+            let c = q.split("=");
+            res[c[0]] = c[1];
+        });
+        return res;
+    }
+
     const path = location.pathname;
     const domain = path.match(/\/d\/(\w+)/)?.[1];
     const relativePath = domain ? path.replace(/\/d\/(\w+)/, "") : path;
     const queries = parseSearch(location.search);
+    const cookies = parseCookie(document.cookie);
 
+    const user = $("a.nav__item").last()[0].href.match(/\d+$/)[0];
+
+    /**
+     * @returns {string}
+     */
     function ppwd() {
         return domain ? `/d/${domain}` : "";
     }
@@ -72,9 +90,38 @@
 
     const selectedTags = ["unselected", "selected"];
 
-    /**
-     * @type {NodeJS.Dict<RegExp>}
-     */
+    const verdicts = {
+        1: "Accepted",
+        2: "Wrong Answer",
+        7: "Compile Error",
+        8: "System Error",
+        20: "Running",
+    }
+
+    const verdictColors = {
+        1: "#61c25a",
+        2: "#fb6666",
+        7: "#fb6666",
+        8: "#fb6666",
+        20: "#f3a83f",
+    }
+
+    const verdictTextColors = {
+        1: "#25ad40",
+        2: "#fb5555",
+        7: "#fb5555",
+        8: "#fb5555",
+        20: "#f3a83f",
+    }
+
+    const verdictBackgroundColors = {
+        1: "#90ffa0",
+        2: "#ffbbbb",
+        7: "#ffbbbb",
+        8: "#ffbbbb",
+        20: "#fff8bf"
+    }
+
     const regices = {
         home: /^\/$/,
         homeIn: /^\/home/,
@@ -95,7 +142,7 @@
     /**
      * 
      * @param {string} str
-     * @param {string[]} regs
+     * @param {(keyof regices)[]} regs
      */
     function match(str, regs) {
         let res = true;
@@ -106,7 +153,7 @@
     /**
      * 
      * @param {string} str
-     * @param {string[]} regs
+     * @param {(keyof regices)[]} regs
      */
     function unmatch(str, regs) {
         let res = false;
@@ -135,7 +182,7 @@
         jjzn: "C++17 (O2)",
         codeforces: "**无法提交**"
     };
-    //#endregion
+    //#endregion data
 
     //#region styles
     $(`<style>
@@ -171,6 +218,21 @@
         line-height: 20px;
     }
 
+    .smc-sbm {
+        display: flex;
+        flex-direction: row;
+        height: 40.15px;
+    }
+
+    .smc-sbmi {
+        height: 40.15px;
+        line-height: 40.15px;
+    }
+
+    .smc-sbms {
+        padding-left: 10px;
+    }
+
     *[unselected] {
         background-color: var(--exrand-unselected);
     }
@@ -199,6 +261,21 @@
         $(".section.side:contains(\"讨论节点\")").remove();
     }
     //#endregion removal
+
+    //#region 404-check
+    if ($(".error__container").length > 0) {
+        let tit = $("h1").first();
+        tit.text("错误！3秒后返回上一页");
+        let timeout = setTimeout(() => {
+            history.go(-1);
+        }, 3000);
+        tit.on("dblclick", () => {
+            tit.text("错误！");
+            clearTimeout(timeout);
+        });
+        return;
+    }
+    //#endregion 404-check
 
     //#region yiyan
     if (match(relativePath, ["home"])) {
@@ -320,6 +397,79 @@
     //#region submit-code
     if (match(relativePath, ["problem"])) {
         let prob = relativePath.match(regices.pid)[1];
+
+        let submissionbody = $(`<div class="section__body"></div>`);
+
+        class Submission {
+            /**
+             * @param {string} subid
+             * @param {"appendTo" | "prependTo"} mode
+             */
+            constructor(subid, mode) {
+                this.subid = subid;
+                console.log(this.subid);
+                this.jqe = $(`<a class="smc-sbm" href="${ppwd()}/record/${this.subid}" target="_blank"></a>`)[mode](submissionbody);
+                this.update();
+            }
+
+            update() {
+                let self = this;
+                $.ajax({
+                    url: `${ppwd()}/record/${self.subid}`,
+                    method: "GET",
+                    headers: {
+                        accept: "application/json"
+                    },
+                    success(res) {
+                        let sbr = res.rdoc;
+                        if (sbr.status > 8) {
+                            setTimeout(self.update, 500);
+                        }
+                        if (!sbr.judgeAt) {
+                            sbr.judgeAt = "Judging";
+                        }
+                        self.jqe.html(`<span style="border-left: .1875rem solid ${verdictColors[sbr.status]}; color: ${verdictTextColors[sbr.status]}" class="smc-sbmi smc-sbms">
+    ${sbr.score} ${verdicts[sbr.status]}
+</span>
+<span style="margin-left: auto">
+    ${sbr.judgeAt}
+</span>
+`);
+                        if (!sbr.progress) {
+                            sbr.progress = 0;
+                        }
+                        self.jqe.css(`background", "rgb(0, 0) linear-gradient(to right, ${verdictBackgroundColors[sbr.status]} ${sbr.progress}%, rgba(0, 0, 0, 0) ${sbr.progress}%) repeat scroll 0% 0% / auto border-box border-box`);
+                    }
+                });
+            }
+        }
+
+        function fetchSubmittions() {
+            $.ajax({
+                url: `${ppwd()}/record?uidOrName=${user}&pid=${prob}`,
+                method: "GET",
+                headers: {
+                    accept: "application/json"
+                },
+                success(res) {
+                    let sbm = res.rdocs;
+                    sbm.forEach(v => {
+                        new Submission(v._id, "appendTo");
+                    });
+                }
+            });
+        }
+
+        /**
+         * @param {Response} res
+         */
+        function addSubmittions(res) {
+            let subid = res.url.match(regices.pid)[0];
+            new Submission(subid, "prependTo");
+        }
+
+        fetchSubmittions();
+
         let submitbut = $(`<input type="submit" class="rounded primary button" value="递交"></input>`);
         submitbut.on("click", () => {
             let value = $("textarea").val();
@@ -337,10 +487,9 @@
                 method: "POST",
                 mode: "cors",
                 credentials: "include"
-            }).then(res => {
-                location = res.url;
-            });
+            }).then(addSubmittions);
         });
+
         let submitbody = $(`<div class="section__body">
     <label>
         代码语言：${stdlangdis[domain]}
@@ -354,7 +503,12 @@
         提交代码
     </div>
 </div>`).append(submitbody);
-        $(".medium-9.columns").append(submitdiv);
+        let submissiondiv = $(`<div class="section visible">
+    <div class="section__header">
+        提交记录
+    </div>
+</div>`).append(submissionbody);
+        $(".medium-9.columns").append(submitdiv, submissiondiv);
     }
     //#endregion submit-code
 })();
