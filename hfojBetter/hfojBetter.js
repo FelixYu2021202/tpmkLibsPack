@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.4.0
+// @version      1.4.1
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://*.hfoj.net/*
@@ -261,8 +261,8 @@
     }
 
     * {
-        --exrand-selected: rgb(60 65 80);
-        --exrand-unselected: rgb(255 255 255);
+        --exrand-selected: rgb(20 255 20);
+        --exrand-unselected: rgb(128 128 128);
         --exrand-background: rgb(238 238 238);
     }
 </style>`).appendTo($(document.body));

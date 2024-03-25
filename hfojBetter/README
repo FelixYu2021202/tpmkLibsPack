@@ -19,10 +19,11 @@
 
 - Added submission viewer block in problem pages.
 
-### v1.4.0
+### v1.4.1
 
 - Optimized yiyan.
 - Added more yiyan.
+- Optimized exrand.
 - Updated submission viewer.
 - Added hide feature to sections.
 
@@ -30,4 +31,4 @@
 
 [Uncompressed](./hfojBetter.js)
 
-[Compressed](./dist-v1.4.0.min.js)
+[Compressed](./dist-v1.4.1.min.js)
