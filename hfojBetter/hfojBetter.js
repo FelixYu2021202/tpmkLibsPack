@@ -1,14 +1,12 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.2.0
+// @version      1.4.0
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://*.hfoj.net/*
 // @icon         http://hfoj.net/favicon.ico
 // ==/UserScript==
-
-// JQuery-v3.7.1 already satisfied by hfoj.
 
 (function () {
     'use strict';
@@ -49,6 +47,19 @@
     const queries = parseSearch(location.search);
     const cookies = parseCookie(document.cookie);
 
+    /**
+     * @param {string} key
+     * @returns {string}
+     */
+    function getSearch(key) {
+        if (queries[key]) {
+            return `${key}=${queries[key]}`;
+        }
+        else {
+            return "";
+        }
+    }
+
     const user = $("a.nav__item").last()[0].href.match(/\d+$/)[0];
 
     /**
@@ -66,7 +77,11 @@
         "RG9uJ3QgYmUgZGVjYWRlbnQhIQ==",
         "JUU3JThFJUE5TyVFNyU4RSVBOSVFNyU5QSU4NA==",
         "JUU2JThCJTlDJUU4JUIwJUEyJUU2JTlDJTg4JUU0JUJBJUFF",
-        "JUU2JUIwJUE3JUU0JUJDJTlBJUU3JTg3JTgzJUVGJUJDJThDJUU2JUIwJUE3JUU2JTk3JUJBJUU3JTg3JTgz"
+        "JUU2JUIwJUE3JUU0JUJDJTlBJUU3JTg3JTgzJUVGJUJDJThDJUU2JUIwJUE3JUU2JTk3JUJBJUU3JTg3JTgz",
+        "JUU2JTlDJTg4JUU0JUJBJUFFJUU1JUE1JUJEJUU5JTk3JUFBJUVGJUJDJThDJUU2JThCJTlDJUU4JUIwJUEyJUU2JTlDJTg4JUU0JUJBJUFF",
+        "JUU4JThCJUE1JUU4JUEyJUFCJUU1JThGJTkxJUU3JThFJUIwJUU4JUJGJTlEJUU4JUE3JTg0JUVGJUJDJThDJUU1JUIwJTg2JUU4JUEyJUFCJTIwQ0NGJTIwJUU3JUE2JTgxJUU4JUI1JTlCJUU0JUI4JTg5JUU1JUI5JUI0JUUzJTgwJTgy",
+        "WW91J3JlJTIwd3JvbmcuJTIwSGVyZSUyMGlzJTIwd2h5Lg==",
+        "SGFwcHklMjBCb2IlMjBoZWxwcyUyMHlvdSUyMHRvJTIwZmVlbCUyMGxpa2UlMjBhJTIwcGVyc29uJTJDJTIwbm90JTIwYSUyMHBhdGllbnQu",
     ];
     const difficulties = [
         "其他 (0)",
@@ -91,6 +106,7 @@
     const selectedTags = ["unselected", "selected"];
 
     const verdicts = {
+        0: "Fetched",
         1: "Accepted",
         2: "Wrong Answer",
         7: "Compile Error",
@@ -99,6 +115,7 @@
     }
 
     const verdictColors = {
+        0: "#f3a83f",
         1: "#61c25a",
         2: "#fb6666",
         7: "#fb6666",
@@ -107,6 +124,7 @@
     }
 
     const verdictTextColors = {
+        0: "#f3a83f",
         1: "#25ad40",
         2: "#fb5555",
         7: "#fb5555",
@@ -115,11 +133,12 @@
     }
 
     const verdictBackgroundColors = {
+        0: "#fff8bf",
         1: "#90ffa0",
         2: "#ffbbbb",
         7: "#ffbbbb",
         8: "#ffbbbb",
-        20: "#fff8bf"
+        20: "#fff8bf",
     }
 
     const regices = {
@@ -284,6 +303,8 @@
         <h1 class="section__title">
             一言
         </h1>
+    </div>
+    <div class="section__body">
         <p>
             ${decodeURIComponent(atob(yiyan[Math.floor(Math.random() * yiyan.length)]))}
         </p>
@@ -415,15 +436,15 @@
             update() {
                 let self = this;
                 $.ajax({
-                    url: `${ppwd()}/record/${self.subid}`,
+                    url: `${ppwd()}/record/${self.subid}?${getSearch("tid")}`,
                     method: "GET",
                     headers: {
                         accept: "application/json"
                     },
                     success(res) {
                         let sbr = res.rdoc;
-                        if (sbr.status > 8) {
-                            setTimeout(self.update, 500);
+                        if (sbr.status > 8 || sbr.status == 0) {
+                            setTimeout(self.update.bind(self), 500);
                         }
                         if (!sbr.judgeAt) {
                             sbr.judgeAt = "Judging";
@@ -446,7 +467,7 @@
 
         function fetchSubmittions() {
             $.ajax({
-                url: `${ppwd()}/record?uidOrName=${user}&pid=${prob}`,
+                url: `${ppwd()}/record?uidOrName=${user}&pid=${prob}&${getSearch("tid")}`,
                 method: "GET",
                 headers: {
                     accept: "application/json"
@@ -473,7 +494,7 @@
         let submitbut = $(`<input type="submit" class="rounded primary button" value="递交"></input>`);
         submitbut.on("click", () => {
             let value = $("textarea").val();
-            fetch(`${ppwd()}/p/${prob}/submit`, {
+            fetch(`${ppwd()}/p/${prob}/submit?${getSearch("tid")}`, {
                 headers: {
                     accept: "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7",
                     "accept-language": "zh-CN,zh;q=0.9,en;q=0.8",
@@ -511,4 +532,32 @@
         $(".medium-9.columns").append(submitdiv, submissiondiv);
     }
     //#endregion submit-code
+
+    //#region hide-buttons
+    $(".section").each(function () {
+        if ($(this).children().length != 2) {
+            return;
+        }
+        let body = $(this).children(".section__body");
+        if (body.length != 1) {
+            return;
+        }
+        let head = $(this).children(".section__header");
+        if (head.length != 1) {
+            return;
+        }
+        let hideButton = $(`<div class="button">隐藏</div>`).appendTo(head);
+        hideButton.on("click", () => {
+            if (hideButton.text() == "隐藏") {
+                body.hide();
+                hideButton.text("显示");
+            }
+            else {
+                body.show();
+                hideButton.text("隐藏");
+            }
+        });
+    });
+    //#endregion hide-buttons
+
 })();
