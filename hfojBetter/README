@@ -27,8 +27,13 @@
 - Updated submission viewer.
 - Added hide feature to sections.
 
+### v1.5.0
+
+- Added cph support.
+- Added cf domain submission support.
+
 ## Source
 
 [Uncompressed](./hfojBetter.js)
 
-[Compressed](./dist-v1.4.1.min.js)
+[Compressed](./dist-v1.5.0.min.js)

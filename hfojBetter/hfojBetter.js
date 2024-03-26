@@ -1,10 +1,11 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.4.1
+// @version      1.5.0
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://*.hfoj.net/*
+// @grant        GM_xmlhttpRequest
 // @icon         http://hfoj.net/favicon.ico
 // ==/UserScript==
 
@@ -188,7 +189,7 @@
         ybtqm: "cc.cc17o2",
         ybttg: "cc.cc17o2",
         jjzn: "cc.cc17o2",
-        codeforces: "yoxi"
+        codeforces: "codeforces.54"
     };
 
     const stdlangdis = {
@@ -199,7 +200,7 @@
         ybtqm: "C++17 (O2)",
         ybttg: "C++17 (O2)",
         jjzn: "C++17 (O2)",
-        codeforces: "**无法提交**"
+        codeforces: "GNU G++17 7.3.0"
     };
     //#endregion data
 
@@ -309,7 +310,7 @@
             ${decodeURIComponent(atob(yiyan[Math.floor(Math.random() * yiyan.length)]))}
         </p>
     </div>
-</div>`).prependTo($(".large-3, .medium-3")[0]);
+</div>`).prependTo($(".large-3, .medium-3").first());
     }
     //#endregion yiyan
 
@@ -411,7 +412,7 @@
                 }
             });
         });
-        randdiv = randdiv.prependTo($(".large-3, .medium-3")[0]);
+        randdiv = randdiv.prependTo($(".large-3, .medium-3").first());
     }
     //#endregion rand
 
@@ -560,4 +561,64 @@
     });
     //#endregion hide-buttons
 
+    //#region cph
+    if (match(relativePath, ["problem"])) {
+        let prob = relativePath.match(regices.pid)[1];
+
+        let cphdiv = $(`<div class="section side visible" style="border-radius: 10px;">
+    <div class="section__header">
+        <h1 class="section__title">
+            传送至 cph
+        </h1>
+    </div>
+</div>`);
+        let cphbut = $(`<div class="expanded button">传送</div>`);
+        cphbut.on("click", () => {
+            let sps = [];
+            let i = 1;
+            while (true) {
+                if ($(`code.language-input${i}`).length != 1) {
+                    break;
+                }
+                sps.push({
+                    input: $(`code.language-input${i}`).text(),
+                    output: $(`code.language-output${i}`).text()
+                });
+                i++;
+            }
+            GM_xmlhttpRequest({
+                url: "http://localhost:27121/",
+                method: "POST",
+                data: JSON.stringify({
+                    batch: {
+                        id: "hfoj-better",
+                        size: 1
+                    },
+                    name: prob,
+                    url: location.toString(),
+                    interactive: "false",
+                    memoryLimit: 524288,
+                    timeLimit: 5000,
+                    tests: sps,
+                    input: {
+                        type: "stdin",
+                    },
+                    output: {
+                        type: "stdout",
+                    },
+                    testType: "single"
+                }),
+                onload(res) {
+                    if (res.status == 502) {
+                        alert("未启动 cph");
+                    }
+                },
+                onerror() {
+                    alert("传送失败");
+                }
+            });
+        });
+        cphdiv.append($(`<div class="section__body"></div>`).append(cphbut)).prependTo($(".large-3, .medium-3").first());
+    }
+    //#endregion cph
 })();
