@@ -1,11 +1,11 @@
 // ==UserScript==
 // @name         poem cheater
-// @namespace    http://poem.rotriw.com/
+// @namespace    http://poem.**.com/
 // @version      1.1.0
 // @description  poem cheater
 // @author       cosf
-// @match        https://poem.rotriw.com/
-// @icon         https://www.google.com/s2/favicons?sz=64&domain=rotriw.com
+// @match        https://poem.**.com/
+// @icon         https://www.google.com/s2/favicons?sz=64&domain=**.com
 //
 // @require      https://code.jquery.com/jquery-3.7.1.min.js
 // @grant        none
