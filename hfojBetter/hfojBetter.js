@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.5.0
+// @version      1.6.0
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://*.hfoj.net/*
@@ -113,6 +113,7 @@
         7: "Compile Error",
         8: "System Error",
         20: "Running",
+        22: "Compiling",
     }
 
     const verdictColors = {
@@ -122,6 +123,7 @@
         7: "#fb6666",
         8: "#fb6666",
         20: "#f3a83f",
+        22: "#f3a83f",
     }
 
     const verdictTextColors = {
@@ -131,6 +133,7 @@
         7: "#fb5555",
         8: "#fb5555",
         20: "#f3a83f",
+        22: "#f3a83f",
     }
 
     const verdictBackgroundColors = {
@@ -140,6 +143,7 @@
         7: "#ffbbbb",
         8: "#ffbbbb",
         20: "#fff8bf",
+        22: "#fff8bf",
     }
 
     const regices = {
@@ -165,26 +169,18 @@
      * @param {(keyof regices)[]} regs
      */
     function match(str, regs) {
-        let res = true;
-        regs.forEach(reg => res &&= str.match(regices[reg]));
+        let res = false;
+        regs.forEach(reg => res ||= str.match(regices[reg]));
         return res;
     }
 
-    /**
-     * 
-     * @param {string} str
-     * @param {(keyof regices)[]} regs
-     */
-    function unmatch(str, regs) {
-        let res = false;
-        regs.forEach(reg => res ||= str.match(regices[reg]));
-        return !res;
-    }
+    const domains = ["luogu", "system", "python", "ybtqm", "ybttg", "jjzn", "codeforces"];
 
-    const stdlang = {
+    const domainStdlang = {
         luogu: "luogu.cxx/14/gcco2",
         [null]: "cc.cc17o2",
         [undefined]: "cc.cc17o2",
+        system: "cc.cc17o2",
         python: "py.py3",
         ybtqm: "cc.cc17o2",
         ybttg: "cc.cc17o2",
@@ -192,15 +188,28 @@
         codeforces: "codeforces.54"
     };
 
-    const stdlangdis = {
+    const domainStdlangdis = {
         luogu: "NOI 标准语言 C++14 (O2)",
         [null]: "C++17 (O2)",
         [undefined]: "C++17 (O2)",
+        system: "C++17 (O2)",
         python: "Python 3",
         ybtqm: "C++17 (O2)",
         ybttg: "C++17 (O2)",
         jjzn: "C++17 (O2)",
         codeforces: "GNU G++17 7.3.0"
+    };
+
+    const domainName = {
+        luogu: "洛谷",
+        [null]: "主站",
+        [undefined]: "主站",
+        system: "主站",
+        python: "Py",
+        ybtqm: "启蒙",
+        ybttg: "提高",
+        jjzn: "进阶",
+        codeforces: "CF"
     };
     //#endregion data
 
@@ -236,6 +245,10 @@
         margin-top: 10px;
         margin-bottom: 10px;
         line-height: 20px;
+    }
+
+    .jmp-right {
+        margin-right: 10px !important;
     }
 
     .smc-sbm {
@@ -314,8 +327,34 @@
     }
     //#endregion yiyan
 
+    //#region jump
+    if (true) {
+        let jumpdiv = $(`<div class="section side visible" type="border-radius: 10px;">
+    <div class="section__header">
+        <h1 class="section__title">
+            跳转
+        </h1>
+    </div>
+</div>`);
+        let jumpbody = $(`<div class="section__body"></div>`);
+        domains.forEach(dm => {
+            let jumpbut = $(`<div class="button jmp-right">${dm}</div>`);
+            jumpbut.on("click", () => {
+                if (match(relativePath, ["home", "homeIn", "problems", "homework", "discuss", "record", "ranking", "userIn", "blogIn"])) {
+                    location = `/d/${dm}${relativePath}`;
+                }
+                else {
+                    location = `/d/${dm}/`;
+                }
+            });
+            jumpbut.appendTo(jumpbody);
+        });
+        jumpdiv.append(jumpbody).appendTo($(".large-3, .medium-3").first());
+    }
+    //#endregion jump
+
     //#region rand
-    if (unmatch(relativePath, ["homeworkIn", "discussIn", "recordIn", "ranking", "userIn", "homeIn", "blogIn"])) {
+    if (match(relativePath, ["home", "problems", "problem"])) {
         let randdiv = $(`<div class="section side visible" style="border-radius: 10px;">
     <div class="section__header">
         <h1 class="section__title">
@@ -444,6 +483,7 @@
                     },
                     success(res) {
                         let sbr = res.rdoc;
+                        console.log(sbr.status);
                         if (sbr.status > 8 || sbr.status == 0) {
                             setTimeout(self.update.bind(self), 500);
                         }
@@ -505,7 +545,7 @@
                 },
                 referrer: `${ppwd()}/p/${prob}/submit`,
                 referrerPolicy: "strict-origin-when-cross-origin",
-                body: `------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="lang"\r\n\r\n${stdlang[domain]}\r\n------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="code"\r\n\r\n${value}\r\n------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="file"; filename=""\r\nContent-Type: application/octet-stream\r\n\r\n\r\n------WebKitFormBoundaryHappybobSaysYoxi--\r\n`,
+                body: `------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="lang"\r\n\r\n${domainStdlang[domain]}\r\n------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="code"\r\n\r\n${value}\r\n------WebKitFormBoundaryHappybobSaysYoxi\r\nContent-Disposition: form-data; name="file"; filename=""\r\nContent-Type: application/octet-stream\r\n\r\n\r\n------WebKitFormBoundaryHappybobSaysYoxi--\r\n`,
                 method: "POST",
                 mode: "cors",
                 credentials: "include"
@@ -514,7 +554,7 @@
 
         let submitbody = $(`<div class="section__body">
     <label>
-        代码语言：${stdlangdis[domain]}
+        代码语言：${domainStdlangdis[domain]}
     </label>
     <div class="medium-12">
         <textarea class="textbox monospace" spellcheck="false"></textarea>

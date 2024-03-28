@@ -32,8 +32,14 @@
 - Added cph support.
 - Added cf domain submission support.
 
+## v1.6.0
+
+- Updated submission status code.
+- Changed mods' showing condition.
+- Added jumping function (fast jumping between domains).
+
 ## Source
 
 [Uncompressed](./hfojBetter.js)
 
-[Compressed](./dist-v1.5.0.min.js)
+[Compressed](./dist-v1.6.0.min.js)

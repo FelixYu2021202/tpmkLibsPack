@@ -46,7 +46,7 @@ function get(url: string) {
 async function loadContestPage(cid: string, parsed: lg.lgc.ParsedContestScoreboard, pge: number, mxp: number, judge: utl.F<number, boolean>, cb: (res: lg.lgc.ParsedContestScoreboard) => any): Promise<lg.lgc.ParsedContestScoreboard> {
     console.log(pge, mxp);
     const res = await get(`https://www.luogu.com.cn/fe/api/contest/scoreboard/${cid}?page=${pge}`);
-    const raw: lg.lgc.ContestScoreboardPage = JSON.parse(await res.text());
+    const raw: lg.lgc.ContestScoreboard = JSON.parse(await res.text());
     raw.scoreboard.result.forEach(us => {
         parsed.shortRank.push(us.user.uid);
         for (let pid in us.details) {
@@ -69,7 +69,7 @@ async function loadContestPage(cid: string, parsed: lg.lgc.ParsedContestScoreboa
 async function loadContest(cid: string, judge: utl.F<number, boolean>, cb: (res: lg.lgc.ParsedContestScoreboard) => any): Promise<lg.lgc.ParsedContestScoreboard> {
     console.log(1);
     const res = await get(`https://www.luogu.com.cn/fe/api/contest/scoreboard/${cid}?page=1`);
-    const raw: lg.lgc.ContestScoreboardPage = JSON.parse(await res.text());
+    const raw: lg.lgc.ContestScoreboard = JSON.parse(await res.text());
     let parsed: lg.lgc.ParsedContestScoreboard = raw as lg.lgc.ParsedContestScoreboard;
     parsed.problems = [];
     parsed.problemStatus = {};
