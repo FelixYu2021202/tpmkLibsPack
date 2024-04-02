@@ -4,7 +4,9 @@
 // @version      1.6.0
 // @description  Add functions to hfoj
 // @author       cosf
-// @match        http://*.hfoj.net/*
+// @match        http://hfoj.net/*
+// @match        http://hfoj.net
+// @match        10.80.74.11/*
 // @grant        GM_xmlhttpRequest
 // @icon         http://hfoj.net/favicon.ico
 // ==/UserScript==
@@ -82,7 +84,7 @@
         "JUU2JTlDJTg4JUU0JUJBJUFFJUU1JUE1JUJEJUU5JTk3JUFBJUVGJUJDJThDJUU2JThCJTlDJUU4JUIwJUEyJUU2JTlDJTg4JUU0JUJBJUFF",
         "JUU4JThCJUE1JUU4JUEyJUFCJUU1JThGJTkxJUU3JThFJUIwJUU4JUJGJTlEJUU4JUE3JTg0JUVGJUJDJThDJUU1JUIwJTg2JUU4JUEyJUFCJTIwQ0NGJTIwJUU3JUE2JTgxJUU4JUI1JTlCJUU0JUI4JTg5JUU1JUI5JUI0JUUzJTgwJTgy",
         "WW91J3JlJTIwd3JvbmcuJTIwSGVyZSUyMGlzJTIwd2h5Lg==",
-        "SGFwcHklMjBCb2IlMjBoZWxwcyUyMHlvdSUyMHRvJTIwZmVlbCUyMGxpa2UlMjBhJTIwcGVyc29uJTJDJTIwbm90JTIwYSUyMHBhdGllbnQu",
+        "SGFwcHklMjBCb2IlMjBoZWxwcyUyMHlvdSUyMHRvJTIwZmVlbCUyMGxpa2UlMjBhJTIwcGVyc29uJTJDJTIwbm90JTIwYSUyMHBhdGllbnQu"
     ];
     const difficulties = [
         "其他 (0)",
@@ -161,6 +163,8 @@
         ranking: /^\/ranking(\/?)$/,
         userIn: /^\/user/,
         blogIn: /^\/blog/,
+        contest: /^\/contest(\/?)$/,
+        contestIn: /^\/contest/,
     };
 
     /**
@@ -312,14 +316,14 @@
 
     //#region yiyan
     if (match(relativePath, ["home"])) {
-        let yiyandiv = $(`<div class="section side visible" style="border-radius: 10px;">
+        let yiyandiv = $(`<div class="section side" style="border-radius: 10px;">
     <div class="section__header">
         <h1 class="section__title">
             一言
         </h1>
     </div>
     <div class="section__body">
-        <p>
+        <p id="yiyan">
             ${decodeURIComponent(atob(yiyan[Math.floor(Math.random() * yiyan.length)]))}
         </p>
     </div>
@@ -329,7 +333,7 @@
 
     //#region jump
     if (true) {
-        let jumpdiv = $(`<div class="section side visible" type="border-radius: 10px;">
+        let jumpdiv = $(`<div class="section side" type="border-radius: 10px;">
     <div class="section__header">
         <h1 class="section__title">
             跳转
@@ -338,24 +342,24 @@
 </div>`);
         let jumpbody = $(`<div class="section__body"></div>`);
         domains.forEach(dm => {
-            let jumpbut = $(`<div class="button jmp-right">${dm}</div>`);
+            let jumpbut = $(`<div class="button jmp-right">${domainName[dm]}</div>`);
             jumpbut.on("click", () => {
-                if (match(relativePath, ["home", "homeIn", "problems", "homework", "discuss", "record", "ranking", "userIn", "blogIn"])) {
-                    location = `/d/${dm}${relativePath}`;
+                if (match(relativePath, ["problem", "homeworkIn", "recordIn", "discussIn", "contestIn"])) {
+                    location = `/d/${dm}/`;
                 }
                 else {
-                    location = `/d/${dm}/`;
+                    location = `/d/${dm}${relativePath}`;
                 }
             });
             jumpbut.appendTo(jumpbody);
         });
-        jumpdiv.append(jumpbody).appendTo($(".large-3, .medium-3").first());
+        jumpdiv.append(jumpbody).appendTo($(`*[data-sticky], .large-3, .medium-3`).first());
     }
     //#endregion jump
 
     //#region rand
     if (match(relativePath, ["home", "problems", "problem"])) {
-        let randdiv = $(`<div class="section side visible" style="border-radius: 10px;">
+        let randdiv = $(`<div class="section side" style="border-radius: 10px;">
     <div class="section__header">
         <h1 class="section__title">
             随机 ex
@@ -560,12 +564,12 @@
         <textarea class="textbox monospace" spellcheck="false"></textarea>
     </div>
 </div>`).append(submitbut);
-        let submitdiv = $(`<div class="section visible">
+        let submitdiv = $(`<div class="section">
     <div class="section__header">
         提交代码
     </div>
 </div>`).append(submitbody);
-        let submissiondiv = $(`<div class="section visible">
+        let submissiondiv = $(`<div class="section">
     <div class="section__header">
         提交记录
     </div>
@@ -605,7 +609,7 @@
     if (match(relativePath, ["problem"])) {
         let prob = relativePath.match(regices.pid)[1];
 
-        let cphdiv = $(`<div class="section side visible" style="border-radius: 10px;">
+        let cphdiv = $(`<div class="section side" style="border-radius: 10px;">
     <div class="section__header">
         <h1 class="section__title">
             传送至 cph
@@ -661,4 +665,17 @@
         cphdiv.append($(`<div class="section__body"></div>`).append(cphbut)).prependTo($(".large-3, .medium-3").first());
     }
     //#endregion cph
+
+    //#region aprilfool
+    if ((new Date).toDateString().match(/Apr 0[1-3]/)) {
+        function fool() {
+            $("*").each(function () {
+                this.style.color = `rgb(${Math.floor(Math.random() * 256)} ${Math.floor(Math.random() * 256)} ${Math.floor(Math.random() * 256)})`;
+            });
+            setTimeout(fool, 1000);
+        }
+        $("#yiyan").text("Happy April Fools' Day!");
+        fool();
+    }
+    //#endregion aprilfool
 })();
