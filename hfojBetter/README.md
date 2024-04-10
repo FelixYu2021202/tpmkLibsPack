@@ -41,6 +41,7 @@
 ## v1.7.0
 
 - Added April Fools' Day's Effect. This effect will be turned on from April 1st to 3rd.
+- Updated jumping function in record page.
 - Updated submission viewer.
 - Added blog icon in user page.
 
