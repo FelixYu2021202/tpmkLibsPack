@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.6.0
+// @version      1.7.0
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://hfoj.net/*
@@ -109,62 +109,73 @@
     const selectedTags = ["unselected", "selected"];
 
     const verdicts = {
-        0: "Fetched",
+        0: "Waiting",
         1: "Accepted",
         2: "Wrong Answer",
         7: "Compile Error",
         8: "System Error",
         20: "Running",
-        22: "Compiling",
+        21: "Compiling",
+        22: "Fetched",
+    }
+
+    const verdictIcon = {
+        0: "schedule",
+        1: "check",
+        2: "close",
+        7: "close",
+        8: "close",
+        20: "hourglass",
+        21: "hourglass",
+        22: "hourglass"
     }
 
     const verdictColors = {
-        0: "#f3a83f",
+        0: "#000000",
         1: "#61c25a",
         2: "#fb6666",
         7: "#fb6666",
         8: "#fb6666",
         20: "#f3a83f",
+        21: "#f3a83f",
         22: "#f3a83f",
     }
 
     const verdictTextColors = {
-        0: "#f3a83f",
+        0: "#000000",
         1: "#25ad40",
         2: "#fb5555",
         7: "#fb5555",
         8: "#fb5555",
         20: "#f3a83f",
+        21: "#f3a83f",
         22: "#f3a83f",
     }
 
     const verdictBackgroundColors = {
-        0: "#fff8bf",
+        0: "#000000",
         1: "#90ffa0",
         2: "#ffbbbb",
         7: "#ffbbbb",
         8: "#ffbbbb",
         20: "#fff8bf",
+        21: "#fff8bf",
         22: "#fff8bf",
     }
 
     const regices = {
         home: /^\/$/,
-        homeIn: /^\/home/,
         problems: /^\/p(\/?)$/,
         problem: /^\/p\/\w+(\/?)$/,
         pid: /([^\/]+)(\/?)$/,
-        homework: /^\/homework(\/?)$/,
-        homeworkIn: /^\/homework/,
+        homeworkIn: /^\/homework\/(\w+)/,
         discuss: /^\/discuss(\/?)$/,
-        discussIn: /^\/discuss/,
+        discussIn: /^\/discuss\/(\w+)/,
         record: /^\/record(\/?)$/,
-        recordIn: /^\/record/,
-        ranking: /^\/ranking(\/?)$/,
-        userIn: /^\/user/,
-        blogIn: /^\/blog/,
-        contest: /^\/contest(\/?)$/,
-        contestIn: /^\/contest/,
+        recordIn: /^\/record\/(\w+)/,
+        contestIn: /^\/contest\/(\w+)/,
+        user: /^\/user\/(\d+)/,
+        userIn: /^\/user\/(\w+)/,
     };
 
     /**
@@ -174,7 +185,7 @@
      */
     function match(str, regs) {
         let res = false;
-        regs.forEach(reg => res ||= str.match(regices[reg]));
+        regs.forEach(reg => res = res || str.match(regices[reg]));
         return res;
     }
 
@@ -255,6 +266,22 @@
         margin-right: 10px !important;
     }
 
+    .smc-icon {
+        font-family: vj4icon;
+    }
+
+    .smc-pass::before {
+        content: "\\ea0a";
+    }
+
+    .smc-wait::before {
+        content: "\\ea2d";
+    }
+
+    .smc-incr::before {
+        content: "\\ea0e";
+    }
+
     .smc-sbm {
         display: flex;
         flex-direction: row;
@@ -331,16 +358,37 @@
     }
     //#endregion yiyan
 
+    //#region user
+    if (match(relativePath, ["userIn"])) {
+        let user = relativePath.match(regices.user)[1];
+        let blog = $(`<a class="profile-header__contact-item tooltip drop-target drop-abutted drop-abutted-top drop-element-attached-bottom drop-element-attached-center drop-target-attached-top drop-target-attached-center" href="${ppwd()}/blog/${user}" target="_blank" data-tooltip="查看Ta的博客">
+    <span class="icon icon-book"></span>
+</a>`).prependTo(".profile-header__contact-bar");
+    }
+    //#endregion user
+
     //#region jump
     if (true) {
-        let jumpdiv = $(`<div class="section side" type="border-radius: 10px;">
+        let jumpdiv, jumpbody;
+        if (match(relativePath, ["record"])) { // special handling
+            $(`.section:contains("由语言")`).append($(`<div class="section__header">
+    <h1 class="section__title">
+        跳转
+    </h1>
+</div>`));
+            jumpdiv = $(`<div class="section__body"></div>`).appendTo($(`.section:contains("由语言")`));
+            jumpbody = $(`<div></div>`).appendTo(jumpdiv);
+        }
+        else {
+            jumpdiv = $(`<div class="section side" type="border-radius: 10px;">
     <div class="section__header">
         <h1 class="section__title">
             跳转
         </h1>
     </div>
-</div>`);
-        let jumpbody = $(`<div class="section__body"></div>`);
+</div>`).appendTo($(`*[data-sticky], .large-3, .medium-3`).first());
+            jumpbody = $(`<div class="section__body"></div>`).appendTo(jumpdiv);
+        }
         domains.forEach(dm => {
             let jumpbut = $(`<div class="button jmp-right">${domainName[dm]}</div>`);
             jumpbut.on("click", () => {
@@ -348,12 +396,11 @@
                     location = `/d/${dm}/`;
                 }
                 else {
-                    location = `/d/${dm}${relativePath}`;
+                    location = `/d/${dm}${relativePath}${location.search}`;
                 }
             });
             jumpbut.appendTo(jumpbody);
         });
-        jumpdiv.append(jumpbody).appendTo($(`*[data-sticky], .large-3, .medium-3`).first());
     }
     //#endregion jump
 
@@ -495,6 +542,7 @@
                             sbr.judgeAt = "Judging";
                         }
                         self.jqe.html(`<span style="border-left: .1875rem solid ${verdictColors[sbr.status]}; color: ${verdictTextColors[sbr.status]}" class="smc-sbmi smc-sbms">
+    <span class="icon icon-${verdictIcon[sbr.status]}"></span>
     ${sbr.score} ${verdicts[sbr.status]}
 </span>
 <span style="margin-left: auto">

@@ -38,8 +38,14 @@
 - Changed mods' showing condition.
 - Added jumping function (fast jumping between domains).
 
+## v1.7.0
+
+- Added April Fools' Day's Effect. This effect will be turned on from April 1st to 3rd.
+- Updated submission viewer.
+- Added blog icon in user page.
+
 ## Source
 
 [Uncompressed](./hfojBetter.js)
 
-[Compressed](./dist-v1.6.0.min.js)
+[Compressed](./dist-v1.7.0.min.js)
