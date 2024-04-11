@@ -1,21 +1,21 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.7.0
+// @version      1.8.0
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://hfoj.net/*
 // @match        http://hfoj.net
 // @match        10.80.74.11/*
 // @grant        GM_xmlhttpRequest
+// @grant        GM_setValue
+// @grant        GM_getValue
+// @connect      localhost:27121/
 // @icon         http://hfoj.net/favicon.ico
 // ==/UserScript==
 
 (function () {
     'use strict';
-    if (typeof $ == "undefined") {
-        $ = require("jquery");
-    }
 
     //#region prework
     /**
@@ -176,6 +176,7 @@
         contestIn: /^\/contest\/(\w+)/,
         user: /^\/user\/(\d+)/,
         userIn: /^\/user\/(\w+)/,
+        fileUser: /^\/file\/(\d+)/,
     };
 
     /**
@@ -264,6 +265,14 @@
 
     .jmp-right {
         margin-right: 10px !important;
+    }
+
+    .sb-margin-left {
+        margin-left: 8px;
+    }
+
+    .sb-warning {
+        background-color: #e78 !important;
     }
 
     .smc-icon {
@@ -361,11 +370,179 @@
     //#region user
     if (match(relativePath, ["userIn"])) {
         let user = relativePath.match(regices.user)[1];
-        let blog = $(`<a class="profile-header__contact-item tooltip drop-target drop-abutted drop-abutted-top drop-element-attached-bottom drop-element-attached-center drop-target-attached-top drop-target-attached-center" href="${ppwd()}/blog/${user}" target="_blank" data-tooltip="查看Ta的博客">
+        let male = $(`*:contains("♂")`).length;
+        let female = $(`*:contains("♀")`).length;
+        let blog = $(`<a class="profile-header__contact-item tooltip drop-target drop-abutted drop-abutted-top drop-element-attached-bottom drop-element-attached-center drop-target-attached-top drop-target-attached-center" href="${ppwd()}/blog/${user}" target="_blank" data-tooltip="查看${male ? "他" : female ? "她" : "Ta"}的博客">
     <span class="icon icon-book"></span>
 </a>`).prependTo(".profile-header__contact-bar");
     }
     //#endregion user
+
+    //#region badge
+    if (true) {
+        let badge = JSON.parse(GM_getValue("hb-badge", JSON.stringify({
+            34: {
+                content: "Happybob",
+                color: "#575757",
+                textColor: "white"
+            },
+            35: {
+                content: "cosf | 月亮",
+                color: "#575757",
+                textColor: "white"
+            }
+        })));
+        setTimeout(() => {
+            $(".user-profile-link").each(function () { // type 1
+                let self = $(this);
+                let link = self.children("a").first();
+                if (!link.length) {
+                    return;
+                }
+                let user = link.attr("href").match(regices.user)[1];
+                if (badge[user]) {
+                    let b = $(`<a class="user-profile-badge v-center tooltip drop-target drop-abutted drop-abutted-top drop-element-attached-bottom drop-element-attached-center drop-target-attached-top drop-target-attached-center sb-margin-left" href="${ppwd()}/user/${user}" data-tooltip="Hfoj Better Badge"
+    style="color:${badge[user].textColor};background-color:${badge[user].color}">
+    ${badge[user].content}
+</a>`).insertAfter(self.children()[1]);
+                }
+            });
+            $("*[data-uid]").each(function () { // type 2
+                let self = $(this);
+                let user = self.attr("data-uid");
+                if (badge[user]) {
+                    let b = $(`<a class="user-profile-badge v-center tooltip drop-target drop-abutted drop-abutted-top drop-element-attached-bottom drop-element-attached-center drop-target-attached-top drop-target-attached-center sb-margin-left" href="${ppwd()}/user/${user}" data-tooltip="Hfoj Better Badge"
+    style="color:${badge[user].textColor};background-color:${badge[user].color}">
+    ${badge[user].content}
+</a>`).insertAfter(self.children().first().children().first().children()[1]);
+                }
+            });
+            if (match(relativePath, ["userIn"])) { // type 3
+                let user = relativePath.match(regices.user)[1];
+                if (badge[user]) {
+                    let b = $(`<a class="user-profile-badge v-center tooltip drop-target drop-abutted drop-abutted-top drop-element-attached-bottom drop-element-attached-center drop-target-attached-top drop-target-attached-center sb-margin-left" href="${ppwd()}/user/${user}" data-tooltip="Hfoj Better Badge"
+    style="color:${badge[user].textColor};background-color:${badge[user].color}">
+    ${badge[user].content}
+</a>`).appendTo($(".profile-header__main").children().first());
+                }
+            }
+        }, 2000);
+        let sbnav = $(`<li class="nav__list-item dropdown nav__dropdown drop-target drop-element-attached-top drop-element-attached-right drop-target-attached-bottom drop-target-attached-right"
+data-dropdown-custom-class="nav__dropdown"
+data-dropdown-target="#menu-nav-badge"
+data-dropdown-disabledconstraintowindow
+data-dropdown-trigger-desktop-only>
+<span class="nav__item">
+    <span class="icon icon-edit"></span>
+    设置 Badge
+</span>
+</li>`).prependTo($(".nav__list--secondary"));
+        let observer = new MutationObserver(function (mutations) {
+            for (let mutation of mutations) {
+                if (mutation.type == "childList") {
+                    let dropdown = $(mutation.addedNodes[0]).children(`*:contains("undefined")`);
+                    if (!dropdown.length) {
+                        return;
+                    }
+                    dropdown.text("");
+                    let sbdiv = $(`<ol id="#menu-nav-badge" class="dropdown-target menu">
+    <li class="menu__item">
+        <div class="menu__link">
+            <span class="icon icon-account--circle"></span>
+            用户 uid
+        </div>
+    </li>
+</ol>`).appendTo(dropdown);
+                    let sbuser = $(`<input class="expanded"/>`).appendTo(
+                        $(`<div class="menu__link"></div>`).appendTo(
+                            $(`<li class="menu__item"></li>`).appendTo(sbdiv)
+                        )
+                    );
+                    sbdiv.append(`<li class="menu__seperator"></li>`, `<li class="menu__item">
+    <div class="menu__link">
+        <span class="icon icon-comment--text"></span>
+        Badge
+    </div>
+</li>`);
+                    let sbcontent = $(`<input class="expanded"/>`).appendTo(
+                        $(`<div class="menu__link"></div>`).appendTo(
+                            $(`<li class="menu__item"></li>`).appendTo(sbdiv)
+                        )
+                    );
+                    sbdiv.append(`<li class="menu__seperator"></li>`, `<li class="menu__item">
+    <div class="menu__link">
+        <span class="icon icon-erase"></span>
+        Background Color
+    </div>
+</li>`);
+                    let sbcolor = $(`<input class="expanded" value="#575757"/>`).appendTo(
+                        $(`<div class="menu__link"></div>`).appendTo(
+                            $(`<li class="menu__item"></li>`).appendTo(sbdiv)
+                        )
+                    );
+                    sbdiv.append(`<li class="menu__seperator"></li>`, `<li class="menu__item">
+    <div class="menu__link">
+        <span class="icon icon-erase"></span>
+        Text Color
+    </div>
+</li>`);
+                    let sbtextcolor = $(`<input class="expanded" value="white"/>`).appendTo(
+                        $(`<div class="menu__link"></div>`).appendTo(
+                            $(`<li class="menu__item"></li>`).appendTo(sbdiv)
+                        )
+                    );
+                    sbdiv.append(`<li class="menu__seperator"></li>`);
+                    let sbsubmit = $(`<div class="button expanded">设置</div>`).appendTo(
+                        $(`<div class="menu__link"></div>`).appendTo(
+                            $(`<li class="menu__item"></li>`).appendTo(sbdiv)
+                        )
+                    );
+                    let sbclear = $(`<div class="button expanded sb-warning">清除数据</div>`).appendTo(
+                        $(`<div class="menu__link"></div>`).appendTo(
+                            $(`<li class="menu__item"></li>`).appendTo(sbdiv)
+                        )
+                    );
+                    sbsubmit.on("click", () => {
+                        badge[sbuser.val()] = {
+                            content: sbcontent.val(),
+                            color: sbcolor.val(),
+                            textColor: sbtextcolor.val()
+                        }
+                        GM_setValue("hb-badge", JSON.stringify(badge));
+                    });
+                    sbclear.on("click", () => {
+                        let choice = prompt(`你确定要清除数据吗？
+- 输入 1 清除指定对象的 Badge；
+- 输入 2 清除所有人的 Badge（除了默认项）；
+- 输入其他任何东西取消。`);
+                        if (choice == "1") {
+                            badge[sbuser.val()] = undefined;
+                            GM_setValue("hb-badge", JSON.stringify(badge));
+                        }
+                        if (choice == "2") {
+                            badge = {
+                                34: {
+                                    content: "Happybob",
+                                    color: "#575757",
+                                    textColor: "white"
+                                },
+                                35: {
+                                    content: "cosf | 月亮",
+                                    color: "#575757",
+                                    textColor: "white"
+                                }
+                            };
+                            GM_setValue("hb-badge", JSON.stringify(badge));
+                        }
+                    });
+                }
+            }
+        });
+        observer.observe(document.body, {
+            childList: true
+        });
+    }
+    //#endregion badge
 
     //#region jump
     if (true) {

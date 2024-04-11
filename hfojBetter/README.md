@@ -45,8 +45,13 @@
 - Updated submission viewer.
 - Added blog icon in user page.
 
+## v1.8.0
+
+- Added Hfoj Badge.
+- Updated blog icon.
+
 ## Source
 
 [Uncompressed](./hfojBetter.js)
 
-[Compressed](./dist-v1.7.0.min.js)
+[Compressed](./dist-v1.8.0.min.js)
