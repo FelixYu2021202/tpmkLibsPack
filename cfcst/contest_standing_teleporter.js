@@ -6,7 +6,6 @@
 // @author       cosf
 // @match        https://codeforces.com/problemset/problem/*
 // @match        https://codeforces.com/*/problem/*
-// @grant        none
 // ==/UserScript==
 
 (function () {
@@ -42,6 +41,13 @@
             <li>
                 <a href="/contest/${cont}/standings/friends/true" target="_blank">
                     F.S.
+                </a>
+            </li>
+        `).appendTo(ui);
+        $(`
+            <li>
+                <a href="https://luogu.com.cn/problem/CF${cont}${prob}" target="_blank">
+                    Luogu
                 </a>
             </li>
         `).appendTo(ui);

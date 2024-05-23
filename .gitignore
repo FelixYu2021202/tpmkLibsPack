@@ -1,5 +1,6 @@
 node_modules
 ignore
-lcp/*.js
+luogu/*.js
+luogu/articles
 cookie.*
 hfojBetter/theme-4.49.7.css

@@ -455,6 +455,24 @@ export namespace lg {
                 time: number;
                 public: boolean;
             }
+            /**
+             * The data returned when querying solution page.
+             */
+            export interface Solution {
+                content: string;
+                type: string;
+                status: number;
+                postTime: number;
+                author: User;
+                thumbUp: number;
+                commentCount: number;
+                currentUserVoteType: number;
+                contentDescription: string;
+                lid: string;
+                id: number;
+                identifier?: string;
+                title: string;
+            }
         }
         /**
          * Types of _feInjection.currentData
@@ -544,6 +562,14 @@ export namespace lg {
                 publicForums: FeData.Forum[];
                 posts: utl.Wrapped<FeData.Discussion>;
                 canPost: boolean;
+            };
+            /**
+             * The data returned when querying for solution page.
+             */
+            ProblemSolution: {
+                solutions: utl.Wrapped<FeData.Solution>;
+                problem: FeData.OriginProblem;
+                acceptSolution: boolean;
             }
         }
         /**

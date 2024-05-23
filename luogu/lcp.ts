@@ -1,6 +1,7 @@
 import { utl, lg } from "./luogu";
 import cookie from "./cookie";
 import cheerio from "cheerio";
+import ExcelJS from "exceljs";
 
 const cid = "122483";
 
@@ -34,7 +35,7 @@ function get(url: string) {
             "sec-fetch-site": "same-origin",
             "x-csrf-token": "1711625463:mFvJb8Zp8HkGB4A9W8lK43eAydLkhzTtCGdN9Up2I4E=",
             "x-requested-with": "XMLHttpRequest",
-            "cookie": `__client_id=${cookie.client}; _uid=${cookie.uid}`,
+            "cookie": `__client_id=${cookie.luogu.client}; _uid=${cookie.luogu.uid}`,
             "Referer": `https://www.luogu.com.cn/`,
             "Referrer-Policy": "strict-origin-when-cross-origin"
         },
@@ -70,7 +71,7 @@ async function loadContest(cid: string, judge: utl.F<number, boolean>, cb: (res:
     console.log(1);
     const res = await get(`https://www.luogu.com.cn/fe/api/contest/scoreboard/${cid}?page=1`);
     const raw: lg.lgc.ContestScoreboard = JSON.parse(await res.text());
-    let parsed: lg.lgc.ParsedContestScoreboard = raw as lg.lgc.ParsedContestScoreboard;
+    let parsed = raw as lg.lgc.ParsedContestScoreboard;
     parsed.problems = [];
     parsed.problemStatus = {};
     parsed.shortRank = [];

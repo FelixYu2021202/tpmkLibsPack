@@ -11,6 +11,7 @@
 // @grant        GM_setValue
 // @grant        GM_getValue
 // @connect      localhost:27121/
+// @connect      https://www.luogu.com.cn/problem/solution/*
 // @icon         http://hfoj.net/favicon.ico
 // ==/UserScript==
 

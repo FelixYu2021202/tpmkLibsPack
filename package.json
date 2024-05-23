@@ -3,6 +3,7 @@
     "@types/jquery": "^3.5.29",
     "@types/node": "^20.11.30",
     "cheerio": "^1.0.0-rc.12",
+    "exceljs": "^4.4.0",
     "fs": "^0.0.1-security",
     "jquery": "^3.7.1",
     "ws": "^8.16.0"
