@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Codeforces & Atcoder Problem Chooser
 // @namespace    http://luogu.com.cn/
-// @version      1.1.0
+// @version      1.1.1
 // @description  Choose problem from Codeforces and Atcoder
 // @author       cosf
 // @match        https://www.luogu.com.cn/contest/edit/*
@@ -130,8 +130,8 @@
     });
 
     $("#cf-search").on("click", () => {
-        let dif = difselect.val();
-        let st = tags.filter(tag => cfselected[tag]).map(st => encodeURIComponent(st)).join(";");
+        let dif = cfdifselect.val();
+        let st = cftags.filter(tag => cfselected[tag]).map(st => encodeURIComponent(st)).join(";");
         console.log(dif, st);
         GM_xmlhttpRequest({
             url: `https://codeforces.com/api/problemset.problems?tags=${st}`,
