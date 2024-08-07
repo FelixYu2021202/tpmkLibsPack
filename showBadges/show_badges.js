@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name           Show badges
+// @name           Show Badges
 // @namespace      http://luogu.com.cn/
 // @version        1.2
 // @description    Show badges

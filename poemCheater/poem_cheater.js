@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         poem cheater
+// @name         Poem Cheater
 // @namespace    http://poem.**.com/
 // @version      1.1.0
 // @description  poem cheater

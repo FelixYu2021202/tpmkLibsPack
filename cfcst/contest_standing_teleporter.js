@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Contest Standing Teleporter
+// @name         Codeforces Contest Standing Teleporter
 // @namespace    http://luogu.com.cn/
 // @version      0.1
 // @description  Teleports to contest/standings

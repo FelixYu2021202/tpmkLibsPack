@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Codeforces & Atcoder Problem Chooser
 // @namespace    http://luogu.com.cn/
-// @version      1.1.1
+// @version      1.1.2
 // @description  Choose problem from Codeforces and Atcoder
 // @author       cosf
 // @match        https://www.luogu.com.cn/contest/edit/*
@@ -9,7 +9,7 @@
 // @grant        GM_xmlhttpRequest
 // ==/UserScript==
 
-(function () {
+setTimeout(function () {
     'use strict';
 
     let $ = jQuery;
@@ -231,4 +231,4 @@
 
     //#endregion at
 
-})();
+}, 1000);
