@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Hfoj Better
 // @namespace    http://hfoj.net/
-// @version      1.8.0
+// @version      1.8.1
 // @description  Add functions to hfoj
 // @author       cosf
 // @match        http://hfoj.net/*
@@ -113,6 +113,7 @@
         0: "Waiting",
         1: "Accepted",
         2: "Wrong Answer",
+        6: "Runtime Error",
         7: "Compile Error",
         8: "System Error",
         20: "Running",
@@ -124,6 +125,7 @@
         0: "schedule",
         1: "check",
         2: "close",
+        6: "close",
         7: "close",
         8: "close",
         20: "hourglass",
@@ -135,6 +137,7 @@
         0: "#000000",
         1: "#61c25a",
         2: "#fb6666",
+        6: "#fb6666",
         7: "#fb6666",
         8: "#fb6666",
         20: "#f3a83f",
@@ -146,6 +149,7 @@
         0: "#000000",
         1: "#25ad40",
         2: "#fb5555",
+        6: "#fb5555",
         7: "#fb5555",
         8: "#fb5555",
         20: "#f3a83f",
@@ -157,6 +161,7 @@
         0: "#000000",
         1: "#90ffa0",
         2: "#ffbbbb",
+        6: "#ffbbbb",
         7: "#ffbbbb",
         8: "#ffbbbb",
         20: "#fff8bf",
