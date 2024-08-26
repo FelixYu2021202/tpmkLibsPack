@@ -3,7 +3,7 @@ import cookie from "./cookie";
 import cheerio from "cheerio";
 import ExcelJS from "exceljs";
 
-const cid = "122483";
+const cid = "162318";
 
 const judgers: utl.Map<lg.lgc.Mode, utl.F<number, boolean>> = {
     icpc(score: number) {
