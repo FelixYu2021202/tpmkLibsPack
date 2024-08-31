@@ -117,6 +117,7 @@
         6: "Runtime Error",
         7: "Compile Error",
         8: "System Error",
+        9: "Cancelled",
         20: "Running",
         21: "Compiling",
         22: "Fetched",
@@ -130,45 +131,49 @@
         6: "close",
         7: "close",
         8: "close",
+        9: "close",
         20: "hourglass",
         21: "hourglass",
         22: "hourglass"
     }
 
     const verdictColors = {
-        0: "#000000",
+        0: "#a9aaaa",
         1: "#61c25a",
         2: "#fb6666",
         3: "#fb6666",
         6: "#fb6666",
         7: "#fb6666",
         8: "#fb6666",
+        9: "#a9aaaa",
         20: "#f3a83f",
         21: "#f3a83f",
         22: "#f3a83f",
     }
 
     const verdictTextColors = {
-        0: "#000000",
+        0: "#a9aaaa",
         1: "#25ad40",
         2: "#fb5555",
         3: "#fb5555",
         6: "#fb5555",
         7: "#fb5555",
         8: "#fb5555",
+        9: "#a9aaaa",
         20: "#f3a83f",
         21: "#f3a83f",
         22: "#f3a83f",
     }
 
     const verdictBackgroundColors = {
-        0: "#000000",
+        0: "#a9aaaa",
         1: "#90ffa0",
         2: "#ffbbbb",
         3: "#ffbbbb",
         6: "#ffbbbb",
         7: "#ffbbbb",
         8: "#ffbbbb",
+        9: "#a9aaaa",
         20: "#fff8bf",
         21: "#fff8bf",
         22: "#fff8bf",
@@ -723,7 +728,7 @@ data-dropdown-trigger-desktop-only>
                     success(res) {
                         let sbr = res.rdoc;
                         console.log(sbr.status);
-                        if (sbr.status > 8 || sbr.status == 0) {
+                        if (sbr.status > 9 || sbr.status == 0) {
                             setTimeout(self.update.bind(self), 500);
                         }
                         if (!sbr.judgeAt) {
